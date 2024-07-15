@@ -12,13 +12,16 @@ class HostPage extends StatefulWidget {
 
 class _HostPageState extends State<HostPage> {
   IconData statusIcon = Icons.check_circle;
+  Color iconColor = Colors.green;
 
   void _changeStatusIcon() {
     setState(() {
-      if (statusIcon == Icons.check_circle) {
-        statusIcon = Icons.error;
+      if (statusIcon == Icons.highlight_off) {
+        statusIcon = Icons.check_circle_outline;
+        iconColor = Colors.green;
       } else {
-        statusIcon = Icons.check_circle;
+        statusIcon = Icons.highlight_off;
+        iconColor = Colors.red;
       }
     });
   }
@@ -39,6 +42,7 @@ class _HostPageState extends State<HostPage> {
                 return ListTile(
                   leading: Icon(statusIcon),
                   title: Text(widget.participants[index]),
+                  iconColor : iconColor,
                 );
               },
             ),
