@@ -40,9 +40,8 @@ class _HostPageState extends State<HostPage> {
               itemCount: widget.participants.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  leading: Icon(statusIcon),
+                  leading: Icon(statusIcon, color: iconColor),
                   title: Text(widget.participants[index]),
-                  iconColor : iconColor,
                 );
               },
             ),
