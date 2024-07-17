@@ -40,8 +40,13 @@ class MyHomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const HostPage())),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const HostPage(
+                            conferenceName: "定例ミーティング",
+                            participants: ["あ", "い", "う"],
+                          ))),
               child: const Text('開催者ページ'),
             ),
             ElevatedButton(
