@@ -27,32 +27,32 @@ class _HostPageState extends State<HostPage> {
 
   void _changeStatusIcon(index) {
     setState(() {
-      if (statusIcon[index] == Icons.highlight_off) {
-        statusIcon[index] = Icons.check_circle_outline;
+      if (statusIcon == Icons.highlight_off) {
+        statusIcon = Icons.check_circle_outline;
         iconColor = Colors.green;
       } else {
-        statusIcon[index] = Icons.highlight_off;
-        iconColor[index] = Colors.red;
+        statusIcon = Icons.highlight_off;
+        iconColor = Colors.red;
       }
     });
   }
 
-  void _registerAttendance(name) {
+  void _registerAttendance(name,deviceId ) {
     // 出席登録の処理
     // nameのstringがconferenceNameの中に含まれているか確認してインデックスを抽出
     // participantsのインデックスを抽出して、そのインデックスのstatusIconを変更する
       // nameがconferenceNameの中に含まれているか確認してインデックスを抽出
     
     // final myController = TextEditingController();
-    // int index = widget.conferenceName.indexOf(name);
-    // _changeStatusIcon(index);
+    int index = widget.conferenceName.indexOf(name);
+    _changeStatusIcon(index);
     // // 出席完了メッセージを送信
-    // nearbyService.sendMessage(
-    //   deviceId,
-    //   "出席完了"
-    // );
+    nearbyService.sendMessage(
+      deviceId,
+      "出席完了"
+    );
     // // 接続を切る
-    // nearbyService.disconnectPeer(deviceId);
+    nearbyService.disconnectPeer(deviceID: deviceId);
 }
 
 void _aggregateAttendanceData(){
@@ -165,7 +165,7 @@ void _aggregateAttendanceData(){
         nearbyService.dataReceivedSubscription(callback: (data) {
       print("dataReceivedSubscription: ${jsonEncode(data)}");
       // data["message"]（氏名）を取り出して出席確認の処理に入る
-      // _registerAttendance(name);
+      _registerAttendance(data["message"],data["deviceId"]);
     });
   }
 }
