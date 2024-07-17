@@ -46,7 +46,6 @@ class MyHomePage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const HostPage(
-                      deviceType: DeviceType.browser,
                       conferenceName: '会議名',
                       participants: ['人名1', '人名2', '人名3','人名4', '人名5', '人名6','人名7', '人名8', '人名9','人名10', '人名11', '人名12','人名13', '人名14', '人名15','人名16', '人名17', '人名18','人名19', '人名20'],
                       )
