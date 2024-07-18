@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 
 class HostPage extends StatefulWidget {
@@ -37,20 +36,21 @@ class _HostPageState extends State<HostPage> {
 
   void _registerAttendance(name, deviceId) {
     // 出席登録の処理
-    // nameのstringがconferenceNameの中に含まれているか確認してインデックスを抽出
-    // participantsのインデックスを抽出して、そのインデックスのstatusIconを変更する
-    // nameがconferenceNameの中に含まれているか確認してインデックスを抽出
     setState(() {
-      // final myController = TextEditingController();
       for (int i = 0; i < widget.participants.length; i++) {
         if (widget.participants[i] == name && !checkList[i]) {
           checkList[i] = true;
+          nearbyService.sendMessage(deviceId, "出席登録完了");
           break;
         }
+        else if (widget.participants[i] == name && checkList[i]) {
+          nearbyService.sendMessage(deviceId, "出席登録済み");
+          break;
+        } 
+        else if (i == widget.participants.length - 1) {
+          nearbyService.sendMessage(deviceId, "出席者リストに存在しません");
+        }
       }
-      // // 出席完了メッセージを送信
-      nearbyService.sendMessage(deviceId, "出席完了");
-      // // 接続を切る
       nearbyService.disconnectPeer(deviceID: deviceId);
     });
   }
@@ -58,38 +58,15 @@ class _HostPageState extends State<HostPage> {
   void _aggregateAttendanceData() {
     setState(() {
       //出席情報集計処理
+
       // bluetooth待ち解除
-      // nearbyService.stopAdvertisingPeer();
+      nearbyService.stopAdvertisingPeer(); 
+      nearbyService.startBrowsingForPeers();
+      connectedDevices.clear();
       //集計結果画面遷移？？
     });
   }
 
-  void _registerAttendance(name,deviceId ) {
-    // 出席登録の処理
-    // nameのstringがconferenceNameの中に含まれているか確認してインデックスを抽出
-    // participantsのインデックスを抽出して、そのインデックスのstatusIconを変更する
-      // nameがconferenceNameの中に含まれているか確認してインデックスを抽出
-    
-    // final myController = TextEditingController();
-    int index = widget.conferenceName.indexOf(name);
-    _changeStatusIcon(index);
-    // // 出席完了メッセージを送信
-    nearbyService.sendMessage(
-      deviceId,
-      "出席完了"
-    );
-    // // 接続を切る
-    nearbyService.disconnectPeer(deviceID: deviceId);
-}
-
-void _aggregateAttendanceData(){
-  setState(() {
-    //出席情報集計処理
-    // bluetooth待ち解除
-    // nearbyService.stopAdvertisingPeer();
-    //集計結果画面遷移？？
-  });
-}
 
   @override
   void initState() {
@@ -171,15 +148,6 @@ void _aggregateAttendanceData(){
       devicesList.forEach((element) {
         print(
             " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
-/*
-        if (Platform.isAndroid) {
-          if (element.state == SessionState.connected) {
-            nearbyService.stopBrowsingForPeers();
-          } else {
-            nearbyService.startBrowsingForPeers();
-          }
-        }
-        */
       });
 
       setState(() {
@@ -196,8 +164,8 @@ void _aggregateAttendanceData(){
     receivedDataSubscription =
         nearbyService.dataReceivedSubscription(callback: (data) {
       print("dataReceivedSubscription: ${jsonEncode(data)}");
-      // data["message"]（氏名）を取り出して出席確認の処理に入る
-      _registerAttendance(data["message"], data["deviceId"]);
+      String participantName = data["message"];
+      _registerAttendance(participantName, data["senderDeviceId"]);
     });
   }
 }
