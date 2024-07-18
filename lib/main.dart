@@ -46,7 +46,7 @@ class MyHomePage extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const GuestPage())),
+                    MaterialPageRoute(builder: (context) => const GuestPage(DeviceType.guest))),
                 child: const Text('参加者ページ'))
           ],
         ),
