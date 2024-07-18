@@ -10,7 +10,8 @@ class HostPage extends StatefulWidget {
   final String conferenceName;
   final List<String> participants;
 
-  const HostPage({super.key, required this.conferenceName, required this.participants});
+  const HostPage(
+      {super.key, required this.conferenceName, required this.participants});
 
   @override
   _HostPageState createState() => _HostPageState();
@@ -19,21 +20,47 @@ class HostPage extends StatefulWidget {
 class _HostPageState extends State<HostPage> {
   IconData statusIcon = Icons.check_circle;
   Color iconColor = Colors.green;
+  late List<bool> checkList;
   List<Device> devices = [];
   List<Device> connectedDevices = [];
   late NearbyService nearbyService;
   late StreamSubscription subscription;
   late StreamSubscription receivedDataSubscription;
 
-  void _changeStatusIcon(index) {
+  IconData getStatusIcon(bool check) {
+    return check ? Icons.check_circle_outline : Icons.highlight_off;
+  }
+
+  Color getColorIcon(bool check) {
+    return check ? Colors.green : Colors.red;
+  }
+
+  void _registerAttendance(name, deviceId) {
+    // 出席登録の処理
+    // nameのstringがconferenceNameの中に含まれているか確認してインデックスを抽出
+    // participantsのインデックスを抽出して、そのインデックスのstatusIconを変更する
+    // nameがconferenceNameの中に含まれているか確認してインデックスを抽出
     setState(() {
-      if (statusIcon == Icons.highlight_off) {
-        statusIcon = Icons.check_circle_outline;
-        iconColor = Colors.green;
-      } else {
-        statusIcon = Icons.highlight_off;
-        iconColor = Colors.red;
+      // final myController = TextEditingController();
+      for (int i = 0; i < widget.participants.length; i++) {
+        if (widget.participants[i] == name && !checkList[i]) {
+          checkList[i] = true;
+          break;
+        }
       }
+      // // 出席完了メッセージを送信
+      nearbyService.sendMessage(deviceId, "出席完了");
+      // // 接続を切る
+      nearbyService.disconnectPeer(deviceID: deviceId);
+    });
+  }
+
+  void _aggregateAttendanceData() {
+    setState(() {
+      //出席情報集計処理
+      // bluetooth待ち解除
+      // nearbyService.stopAdvertisingPeer();
+      //集計結果画面遷移？？
     });
   }
 
@@ -68,7 +95,9 @@ void _aggregateAttendanceData(){
   void initState() {
     super.initState();
     init();
+    checkList = List<bool>.filled(widget.participants.length, false);
   }
+
   @override
   void dispose() {
     subscription.cancel();
@@ -92,7 +121,8 @@ void _aggregateAttendanceData(){
               itemCount: widget.participants.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  leading: Icon(statusIcon, color: iconColor),
+                  leading: Icon(getStatusIcon(checkList[index]),
+                      color: getColorIcon(checkList[index])),
                   title: Text(widget.participants[index]),
                 );
               },
@@ -109,6 +139,7 @@ void _aggregateAttendanceData(){
       ),
     );
   }
+
   void init() async {
     nearbyService = NearbyService();
     String devInfo = '';
@@ -123,15 +154,15 @@ void _aggregateAttendanceData(){
     }
     await nearbyService.init(
         serviceType: 'mpconn',
-        deviceName: devInfo,
+        deviceName: widget.conferenceName,
         strategy: Strategy.P2P_STAR, // 1-to-N
         callback: (isRunning) async {
           if (isRunning) {
-              await nearbyService.stopAdvertisingPeer();
-              await nearbyService.stopBrowsingForPeers();
-              await Future.delayed(Duration(microseconds: 200));
-              await nearbyService.startAdvertisingPeer();
-              await nearbyService.startBrowsingForPeers();
+            await nearbyService.stopAdvertisingPeer();
+            await nearbyService.stopBrowsingForPeers();
+            await Future.delayed(Duration(microseconds: 200));
+            await nearbyService.startAdvertisingPeer();
+            await nearbyService.startBrowsingForPeers();
             // }
           }
         });
@@ -140,7 +171,7 @@ void _aggregateAttendanceData(){
       devicesList.forEach((element) {
         print(
             " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
-
+/*
         if (Platform.isAndroid) {
           if (element.state == SessionState.connected) {
             nearbyService.stopBrowsingForPeers();
@@ -148,6 +179,7 @@ void _aggregateAttendanceData(){
             nearbyService.startBrowsingForPeers();
           }
         }
+        */
       });
 
       setState(() {
@@ -165,8 +197,7 @@ void _aggregateAttendanceData(){
         nearbyService.dataReceivedSubscription(callback: (data) {
       print("dataReceivedSubscription: ${jsonEncode(data)}");
       // data["message"]（氏名）を取り出して出席確認の処理に入る
-      _registerAttendance(data["message"],data["deviceId"]);
+      _registerAttendance(data["message"], data["deviceId"]);
     });
   }
 }
-
