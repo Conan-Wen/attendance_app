@@ -2,88 +2,79 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class Meeting {
-  String name;
+  int id;
+  String meetingName;
   List<String> participants;
 
-  Meeting({required this.name, required this.participants});
+  Meeting(
+      {required this.id,
+      required this.meetingName,
+      required this.participants});
 
-  // Convert a Meeting object into a Map object
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
-      'participants': participants.join(','),
+      'id': id,
+      'meetingName': meetingName,
+      'participants': participants.join(','), // 参加者を文字列に変換
     };
   }
 
-  // Extract a Meeting object from a Map object
-  static Meeting fromMap(Map<String, dynamic> map) {
+  Map<String, dynamic> toMapExceptId() {
+    return {'meetingName': meetingName, 'participants': participants.join(',')};
+  }
+
+  factory Meeting.fromMap(Map<String, dynamic> map) {
     return Meeting(
-      name: map['name'],
-      participants: List<String>.from(map['participants'].split(',')),
+      id: map['id'],
+      meetingName: map['meetingName'],
+      participants: map['participants'].split(','), // 文字列をリストに変換
     );
   }
 }
 
 class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper._internal();
-  factory DatabaseHelper() => _instance;
-  DatabaseHelper._internal();
-
-  Database? _database;
+  static Database? _database;
+  static const String tableName = 'meetings';
 
   Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
+    if (_database != null) {
+      return _database!;
+    }
+    _database = await initDatabase();
     return _database!;
   }
 
-  //データベースの初期化
-  Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'meeting_database.db');
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-    );
+  Future<Database> initDatabase() async {
+    String path = join(await getDatabasesPath(), 'meetings_database.db');
+    return await openDatabase(path, version: 1, onCreate: _createDatabase);
   }
 
-  //データベースとテーブルの作成
-  Future _onCreate(Database db, int version) async {
+  void _createDatabase(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE meetings (
+      CREATE TABLE $tableName(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        participants TEXT NOT NULL
+        meetingName TEXT,
+        participants TEXT
       )
     ''');
   }
 
-  //会議データの挿入
   Future<void> insertMeeting(Meeting meeting) async {
-    final db = await database;
-    await db.insert(
-      'meetings',
-      meeting.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    final Database db = await database;
+    await db.insert(tableName, meeting.toMapExceptId(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  //会議データの削除
-  Future<void> deleteMeeting(String name) async {
-    final db = await database;
-    await db.delete(
-      'meetings',
-      where: 'name = ?',
-      whereArgs: [name],
-    );
-  }
-
-  //会議データの取得
   Future<List<Meeting>> getMeetings() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('meetings');
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(tableName);
     return List.generate(maps.length, (i) {
       return Meeting.fromMap(maps[i]);
     });
+  }
+
+  Future<void> deleteMeeting(int id) async {
+    final db = await database;
+    await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 }

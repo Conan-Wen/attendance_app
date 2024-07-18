@@ -52,12 +52,12 @@ class _SelectPage extends State<SelectPage> {
               itemBuilder: (context, index) {
                 final meeting = snapshot.data![index];
                 return ListTile(
-                    title: Text(meeting.name),
+                    title: Text(meeting.meetingName),
                     subtitle: Text('参加者: ${meeting.participants.join(', ')}'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () async {
-                        await DatabaseHelper().deleteMeeting(meeting.name);
+                        await DatabaseHelper().deleteMeeting(meeting.id);
                         setState(() {
                           meetings = DatabaseHelper().getMeetings();
                         });
@@ -67,7 +67,7 @@ class _SelectPage extends State<SelectPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => HostPage(
-                                  conferenceName: meeting.name,
+                                  conferenceName: meeting.meetingName,
                                   participants: meeting.participants,
                                 ))));
               },
