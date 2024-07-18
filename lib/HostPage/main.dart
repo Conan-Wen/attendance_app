@@ -66,7 +66,7 @@ class _HostPageState extends State<HostPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => HostfinalPage(participants:widget.participants, checkList:checkList)
+            builder: (context) => HostResultPage(participants:widget.participants, checkList:checkList)
         )
       );
     });
