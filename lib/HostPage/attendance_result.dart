@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'attendance_result_database.dart';
 
 // <- 出席結果画面 ->
 class AttendanceResultScreen extends StatelessWidget {
   final List<String> participants;
   final List<bool> checkList;
+  final String conferenceName;
 
   const AttendanceResultScreen(
-      {super.key, required this.participants, required this.checkList});
+      {super.key, required this.participants, required this.checkList ,required this.conferenceName});
 
   @override
   Widget build(BuildContext context) {
+    List<String> participantsName = [];
+    List<String> absenteesName = [];
+    String conferenceName = this.conferenceName;
     List<DropdownMenuItem<String>> presentItems = [];
     List<DropdownMenuItem<String>> absentItems = [];
 
@@ -21,10 +26,18 @@ class AttendanceResultScreen extends StatelessWidget {
 
       if (checkList[i]) {
         presentItems.add(item);
+        participantsName.add(participants[i]);
       } else {
         absentItems.add(item);
+        absenteesName.add(participants[i]);
       }
     }
+    // databaseに出席者と不在者を登録
+    DatabaseHelperAttendanceResult().insertAttendanceResult(AttendanceResult(
+        id: 0,
+        conferenceName: conferenceName,
+        participantsName: participantsName,
+        absenteesName: absenteesName));
 
   return Scaffold(
     appBar: AppBar(

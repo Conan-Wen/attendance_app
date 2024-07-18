@@ -38,6 +38,8 @@ dependencies:
   flutter_nearby_connections: ^1.1.2
   flutter_styled_toast: ^2.2.1
   device_info_plus: ^10.1.0
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:
