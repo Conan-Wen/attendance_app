@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './main.dart';
 import 'Database.dart';
+import 'AddMeetingScreen.dart';
 
 class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
@@ -18,6 +19,18 @@ class _SelectPage extends State<SelectPage> {
     meetings = DatabaseHelper().getMeetings();
   }
 
+  void _navigateToAddMeeting() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddMeetingScreen()),
+    );
+    if (result == true) {
+      setState(() {
+        meetings = DatabaseHelper().getMeetings();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,40 +45,38 @@ class _SelectPage extends State<SelectPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No meetings found.'));
+            return Center(child: Text('登録した会議はありません'));
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final meeting = snapshot.data![index];
                 return ListTile(
-                  title: Text(meeting.name),
-                  subtitle:
-                      Text('Participants: ${meeting.participants.join(', ')}'),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () async {
-                      await DatabaseHelper().deleteMeeting(meeting.name);
-                      setState(() {
-                        meetings = DatabaseHelper().getMeetings();
-                      });
-                    },
-                  ),
-                );
+                    title: Text(meeting.name),
+                    subtitle: Text('参加者: ${meeting.participants.join(', ')}'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () async {
+                        await DatabaseHelper().deleteMeeting(meeting.name);
+                        setState(() {
+                          meetings = DatabaseHelper().getMeetings();
+                        });
+                      },
+                    ),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HostPage(
+                                  conferenceName: meeting.name,
+                                  participants: meeting.participants,
+                                ))));
               },
             );
           }
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // ダイアログなどで新しい会議を追加するコードをここに記述
-          await DatabaseHelper().insertMeeting(
-              Meeting(name: 'New Meeting', participants: ['New Participant']));
-          setState(() {
-            meetings = DatabaseHelper().getMeetings();
-          });
-        },
+        onPressed: _navigateToAddMeeting,
         child: Icon(Icons.add),
       ),
     );
