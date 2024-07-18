@@ -64,11 +64,11 @@ class _HostPageState extends State<HostPage> {
       connectedDevices.clear();
       //集計結果画面遷移？？
       Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HostfinalPage(participants:widget.participants, checkList:checkList)
-                      )
-                    );
+        context,
+        MaterialPageRoute(
+            builder: (context) => HostfinalPage(participants:widget.participants, checkList:checkList)
+        )
+      );
     });
   }
 
@@ -175,11 +175,11 @@ class _HostPageState extends State<HostPage> {
   }
 }
 
-class HostfinalPage extends StatelessWidget {
+class HostResultPage extends StatelessWidget {
   final List<String> participants;
   final List<bool> checkList;
 
-  const HostfinalPage(
+  const HostResultPage(
       {super.key, required this.participants, required this.checkList});
 
   @override
@@ -187,14 +187,12 @@ class HostfinalPage extends StatelessWidget {
     List<DropdownMenuItem<String>> presentItems = [];
     List<DropdownMenuItem<String>> absentItems = [];
 
-    // participantsリストをイテレートし、各アイテムに対してDropdownMenuItemを作成
     for (int i = 0; i < participants.length; i++) {
       var item = DropdownMenuItem(
         value: participants[i],
         child: Text(participants[i]),
       );
 
-      // checkListの値に基づいて、適切なリストにアイテムを追加
       if (checkList[i]) {
         presentItems.add(item);
       } else {
@@ -241,7 +239,6 @@ class HostfinalPage extends StatelessWidget {
       ],
     ),
     floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    // ボタンを置く
     floatingActionButton: FloatingActionButton(
       onPressed: () {
         Navigator.popUntil(context, (route) => route.isFirst);
