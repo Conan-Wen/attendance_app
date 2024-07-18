@@ -1,9 +1,11 @@
+import 'package:attendance_app/HostPage/attendance_result.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
+
 class HostPage extends StatefulWidget {
   final String conferenceName;
   final List<String> participants;
@@ -66,7 +68,7 @@ class _HostPageState extends State<HostPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => HostResultPage(participants:widget.participants, checkList:checkList)
+            builder: (context) => AttendanceResultScreen(participants:widget.participants, checkList:checkList)
         )
       );
     });
@@ -172,79 +174,5 @@ class _HostPageState extends State<HostPage> {
       String participantName = data["message"];
       _registerAttendance(participantName, data["senderDeviceId"]);
     });
-  }
-}
-
-class HostResultPage extends StatelessWidget {
-  final List<String> participants;
-  final List<bool> checkList;
-
-  const HostResultPage(
-      {super.key, required this.participants, required this.checkList});
-
-  @override
-  Widget build(BuildContext context) {
-    List<DropdownMenuItem<String>> presentItems = [];
-    List<DropdownMenuItem<String>> absentItems = [];
-
-    for (int i = 0; i < participants.length; i++) {
-      var item = DropdownMenuItem(
-        value: participants[i],
-        child: Text(participants[i]),
-      );
-
-      if (checkList[i]) {
-        presentItems.add(item);
-      } else {
-        absentItems.add(item);
-      }
-    }
-
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('集計結果'),
-    ),
-    body: ListView(
-      children: [
-        ExpansionTile(
-          title: const Text("出席者"),
-          children: [
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: presentItems.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: presentItems[index],
-                );
-              },
-            ),
-          ],
-        ),
-        ExpansionTile(
-          title: const Text("不在者"),
-          children: [
-            ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: absentItems.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: absentItems[index],
-                );
-              },
-            ),
-          ],
-        ),
-      ],
-    ),
-    floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    floatingActionButton: FloatingActionButton(
-      onPressed: () {
-        Navigator.popUntil(context, (route) => route.isFirst);
-      },
-      child: const Icon(Icons.home),
-    ),
-  );
   }
 }
