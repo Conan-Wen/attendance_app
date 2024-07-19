@@ -14,10 +14,10 @@ class HostPage extends StatefulWidget {
       {super.key, required this.conferenceName, required this.participants});
 
   @override
-  _HostPageState createState() => _HostPageState();
+  HostPageState createState() => HostPageState();
 }
 
-class _HostPageState extends State<HostPage> {
+class HostPageState extends State<HostPage> {
   IconData statusIcon = Icons.check_circle;
   Color iconColor = Colors.green;
   late List<bool> checkList;
@@ -141,7 +141,7 @@ class _HostPageState extends State<HostPage> {
           if (isRunning) {
             await nearbyService.stopAdvertisingPeer();
             await nearbyService.stopBrowsingForPeers();
-            await Future.delayed(Duration(microseconds: 200));
+            await Future.delayed(const Duration(microseconds: 200));
             await nearbyService.startAdvertisingPeer();
             await nearbyService.startBrowsingForPeers();
             // }

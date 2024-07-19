@@ -11,10 +11,10 @@ class AttendanceResultScreen extends StatefulWidget {
       {super.key, required this.participants, required this.checkList ,required this.conferenceName});
 
   @override
-  _AttendanceResultScreenState createState() => _AttendanceResultScreenState();
+  AttendanceResultScreenState createState() => AttendanceResultScreenState();
 }
 
-class _AttendanceResultScreenState extends State<AttendanceResultScreen> {
+class AttendanceResultScreenState extends State<AttendanceResultScreen> {
   Future<void> saveAttendanceResult() async {
     await DatabaseHelperAttendanceResult().insertAttendanceResult(AttendanceResult(
       id: 0,
@@ -26,7 +26,7 @@ class _AttendanceResultScreenState extends State<AttendanceResultScreen> {
       Navigator.popUntil(context, (route) => route.isFirst);
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     List<String> participantsName = [];
@@ -49,51 +49,51 @@ class _AttendanceResultScreenState extends State<AttendanceResultScreen> {
       }
     }
 
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('集計結果'),
-    ),
-    body: ListView(
-      children: [
-        ExpansionTile(
-          title: const Text("出席者"),
-          children: [
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: presentItems.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: presentItems[index],
-                );
-              },
-            ),
-          ],
-        ),
-        ExpansionTile(
-          title: const Text("不在者"),
-          children: [
-            ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: absentItems.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: absentItems[index],
-                );
-              },
-            ),
-          ],
-        ),
-      ],
-    ),
-    floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    floatingActionButton: FloatingActionButton(
-      onPressed: () async{
-        await saveAttendanceResult();
-      },
-      child: const Icon(Icons.home),
-    ),
-  );
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('集計結果'),
+      ),
+      body: ListView(
+        children: [
+          ExpansionTile(
+            title: const Text("出席者"),
+            children: [
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: presentItems.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: presentItems[index],
+                  );
+                },
+              ),
+            ],
+          ),
+          ExpansionTile(
+            title: const Text("不在者"),
+            children: [
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: absentItems.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: absentItems[index],
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async{
+          await saveAttendanceResult();
+        },
+        child: const Icon(Icons.home),
+      ),
+    );
   }
 }
