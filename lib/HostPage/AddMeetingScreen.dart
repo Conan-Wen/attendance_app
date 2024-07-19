@@ -74,52 +74,49 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                 },
               ),
             ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () async {
-                    final name = _nameController.text;
-                    final participants = _participantControllers
-                        .map((controller) => controller.text)
-                        .where((text) => text.isNotEmpty)
-                        .toList();
-                    if (name.isNotEmpty && participants.isNotEmpty) {
-                      await DatabaseHelper().insertMeeting(Meeting(
-                          id: 0,
-                          meetingName: name,
-                          participants: participants));
-                      Navigator.of(context).pop(true); // trueを渡して追加が成功したことを示す
-                    }
-                  },
-                  child: Text('会議の追加'),
-                ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    final name = _nameController.text;
-                    final participants = _participantControllers
-                        .map((controller) => controller.text)
-                        .where((text) => text.isNotEmpty)
-                        .toList();
-                    if (name.isNotEmpty && participants.isNotEmpty) {
-                      await DatabaseHelper().insertMeeting(Meeting(
-                          id: 0,
-                          meetingName: name,
-                          participants: participants));
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HostPage(
-                                    conferenceName: name,
-                                    participants: participants,
-                                  )));
-                    }
-                  },
-                  child: Text('会議の開始'),
-                ),
-              ],
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () async {
+                final name = _nameController.text;
+                final participants = _participantControllers
+                    .map((controller) => controller.text)
+                    .where((text) => text.isNotEmpty)
+                    .toList();
+                if (name.isNotEmpty && participants.isNotEmpty) {
+                  await DatabaseHelper().insertMeeting(Meeting(
+                      id: 0, meetingName: name, participants: participants));
+                  Navigator.of(context).pop(true); // trueを渡して追加が成功したことを示す
+                }
+              },
+              child: Text('会議の追加'),
+            ),
+            SizedBox(width: 20),
+            ElevatedButton(
+              onPressed: () async {
+                final name = _nameController.text;
+                final participants = _participantControllers
+                    .map((controller) => controller.text)
+                    .where((text) => text.isNotEmpty)
+                    .toList();
+                if (name.isNotEmpty && participants.isNotEmpty) {
+                  await DatabaseHelper().insertMeeting(Meeting(
+                      id: 0, meetingName: name, participants: participants));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HostPage(
+                                conferenceName: name,
+                                participants: participants,
+                              )));
+                }
+              },
+              child: Text('会議の開始'),
             ),
           ],
         ),
