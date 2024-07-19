@@ -108,7 +108,7 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                           id: 0,
                           meetingName: name,
                           participants: participants));
-                      Navigator.push(
+                      Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                               builder: (context) => HostPage(

@@ -19,16 +19,23 @@ class _SelectPage extends State<SelectPage> {
     meetings = DatabaseHelper().getMeetings();
   }
 
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    setState(() {
+      meetings = DatabaseHelper().getMeetings();
+    });
+  }
+
   void _navigateToAddMeeting() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AddMeetingScreen()),
     );
-    if (result == true) {
-      setState(() {
-        meetings = DatabaseHelper().getMeetings();
-      });
-    }
+    setState(() {
+      meetings = DatabaseHelper().getMeetings();
+    });
   }
 
   @override
