@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'attendance_result_database.dart';
 
 // <- 出席結果画面 ->
-class AttendanceResultScreen extends StatelessWidget {
+class AttendanceResultScreen extends StatefulWidget {
   final List<String> participants;
   final List<bool> checkList;
   final String conferenceName;
@@ -11,33 +11,43 @@ class AttendanceResultScreen extends StatelessWidget {
       {super.key, required this.participants, required this.checkList ,required this.conferenceName});
 
   @override
+  _AttendanceResultScreenState createState() => _AttendanceResultScreenState();
+}
+
+class _AttendanceResultScreenState extends State<AttendanceResultScreen> {
+  Future<void> saveAttendanceResult() async {
+    await DatabaseHelperAttendanceResult().insertAttendanceResult(AttendanceResult(
+      id: 0,
+      conferenceName: widget.conferenceName,
+      participantsName: widget.participants,
+      checkList: widget.checkList,
+    ));
+    if (mounted) {
+      Navigator.popUntil(context, (route) => route.isFirst);
+    }
+  }
+  
+  @override
   Widget build(BuildContext context) {
     List<String> participantsName = [];
     List<String> absenteesName = [];
-    String conferenceName = this.conferenceName;
     List<DropdownMenuItem<String>> presentItems = [];
     List<DropdownMenuItem<String>> absentItems = [];
 
-    for (int i = 0; i < participants.length; i++) {
+    for (int i = 0; i < widget.participants.length; i++) {
       var item = DropdownMenuItem(
-        value: participants[i],
-        child: Text(participants[i]),
+        value: widget.participants[i],
+        child: Text(widget.participants[i]),
       );
 
-      if (checkList[i]) {
+      if (widget.checkList[i]) {
         presentItems.add(item);
-        participantsName.add(participants[i]);
+        participantsName.add(widget.participants[i]);
       } else {
         absentItems.add(item);
-        absenteesName.add(participants[i]);
+        absenteesName.add(widget.participants[i]);
       }
     }
-    // databaseに出席者と不在者を登録
-    DatabaseHelperAttendanceResult().insertAttendanceResult(AttendanceResult(
-        id: 0,
-        conferenceName: conferenceName,
-        participantsName: participantsName,
-        absenteesName: absenteesName));
 
   return Scaffold(
     appBar: AppBar(
@@ -79,8 +89,8 @@ class AttendanceResultScreen extends StatelessWidget {
     ),
     floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     floatingActionButton: FloatingActionButton(
-      onPressed: () {
-        Navigator.popUntil(context, (route) => route.isFirst);
+      onPressed: () async{
+        await saveAttendanceResult();
       },
       child: const Icon(Icons.home),
     ),
