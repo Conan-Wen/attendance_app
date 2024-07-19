@@ -28,7 +28,7 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('会議追加ページ'),
+        title: Text('新しい会議'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -94,7 +94,7 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                   Navigator.of(context).pop(true); // trueを渡して追加が成功したことを示す
                 }
               },
-              child: Text('会議の追加'),
+              child: Text('会議を登録'),
             ),
             SizedBox(width: 20),
             ElevatedButton(
