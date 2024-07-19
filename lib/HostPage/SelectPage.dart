@@ -1,42 +1,107 @@
 import 'package:flutter/material.dart';
 import './main.dart';
+import 'Database.dart';
+import 'AddMeetingScreen.dart';
+import 'attendance_result.dart';
+import 'ClosedPage.dart';
 
-class SelectPage extends StatelessWidget {
-  final List<String> conferenceNames;
-  final Map<String,List<String>> participantMap;
-  var index = 1;//Listviewのindex、とりあえず0で初期化
-  SelectPage({super.key, required this.conferenceNames, required this.participantMap});
+class SelectPage extends StatefulWidget {
+  const SelectPage({super.key});
+
+  @override
+  _SelectPage createState() => _SelectPage();
+}
+
+class _SelectPage extends State<SelectPage> {
+  late Future<List<Meeting>> meetings;
+
+  @override
+  void initState() {
+    super.initState();
+    meetings = DatabaseHelper().getMeetings();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    setState(() {
+      meetings = DatabaseHelper().getMeetings();
+    });
+  }
+
+  void _navigateToAddMeeting() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddMeetingScreen()),
+    );
+    setState(() {
+      meetings = DatabaseHelper().getMeetings();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("開催者ページ"),
+        title: Text('開催者ページ'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HostPage(
-                        conferenceName: conferenceNames[index],
-                        participants: participantMap[conferenceNames[index]]!,
-                      ))),
-              child: Container(//ここをlistviewにする
-                width: 200,
-                height: 50,
-                child: Center(
-                  child: Text(conferenceNames[index]),
-                ),
-              )
-            ),
-          ],
-        ),
+      body: FutureBuilder<List<Meeting>>(
+        future: meetings,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('登録した会議はありません'));
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final meeting = snapshot.data![index];
+                String closing = meeting.closed == 0 ? '' : '(締切済み)';
+                return ListTile(
+                    title: Text(meeting.meetingName + closing),
+                    subtitle: Text('参加者: ${meeting.participants.join(', ')}'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () async {
+                        await DatabaseHelper().deleteMeeting(meeting.id);
+                        setState(() {
+                          meetings = DatabaseHelper().getMeetings();
+                        });
+                      },
+                    ),
+                    onTap: () {
+                      if (meeting.closed == 0) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HostPage(
+                              id: meeting.id,
+                              conferenceName: meeting.meetingName,
+                              participants: meeting.participants,
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MeetingClosedPage(),
+                          ),
+                        );
+                      }
+                    });
+              },
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToAddMeeting,
+        child: Icon(Icons.add),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:attendance_app/HostPage/attendance_result.dart';
 import 'package:flutter/material.dart';
+import 'package:attendance_app/HostPage/Database.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -7,11 +8,13 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 
 class HostPage extends StatefulWidget {
+  final int id;
   final String conferenceName;
   final List<String> participants;
+  final int closed = 0;
 
   const HostPage(
-      {super.key, required this.conferenceName, required this.participants});
+      {super.key, required this.id, required this.conferenceName, required this.participants});
 
   @override
   _HostPageState createState() => _HostPageState();
@@ -43,12 +46,10 @@ class _HostPageState extends State<HostPage> {
           checkList[i] = true;
           nearbyService.sendMessage(deviceId, "出席登録完了");
           break;
-        }
-        else if (widget.participants[i] == name && checkList[i]) {
+        } else if (widget.participants[i] == name && checkList[i]) {
           nearbyService.sendMessage(deviceId, "出席登録済み");
           break;
-        } 
-        else if (i == widget.participants.length - 1) {
+        } else if (i == widget.participants.length - 1) {
           nearbyService.sendMessage(deviceId, "出席者リストに存在しません");
         }
       }
@@ -59,21 +60,24 @@ class _HostPageState extends State<HostPage> {
   void _aggregateAttendanceData() {
     setState(() {
       //出席情報集計処理
-    
+
       // bluetooth待ち解除
-      nearbyService.stopAdvertisingPeer(); 
+      nearbyService.stopAdvertisingPeer();
       nearbyService.startBrowsingForPeers();
       connectedDevices.clear();
       //集計結果画面遷移？？
+      DatabaseHelper().updateMeeting(Meeting(
+          id: widget.id,
+          meetingName: widget.conferenceName,
+          participants: widget.participants,
+          closed: 1));
       Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => AttendanceResultScreen(participants:widget.participants, checkList:checkList)
-        )
-      );
+          context,
+          MaterialPageRoute(
+              builder: (context) => AttendanceResultScreen(
+                  participants: widget.participants, checkList: checkList)));
     });
   }
-
 
   @override
   void initState() {
