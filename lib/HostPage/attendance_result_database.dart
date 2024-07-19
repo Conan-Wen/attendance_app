@@ -5,16 +5,17 @@ class AttendanceResult{
   int id;
   String conferenceName;
   List<String> participantsName;
-  List<String> absenteesName;
+  List<bool> checkList;
 
-  AttendanceResult({required this.id, required this.conferenceName,required this.participantsName,required this.absenteesName});
+
+  AttendanceResult({required this.id, required this.conferenceName,required this.participantsName,required this.checkList});
 
   Map<String, dynamic> toMap(){
     return {
       'id': id,
       'conferenceName': conferenceName,
       'participantsName': participantsName,
-      'absenteesName': absenteesName,
+      'checkList': checkList,
     };
   }
 
@@ -22,7 +23,7 @@ class AttendanceResult{
     return {
       'conferenceName': conferenceName,
       'participantsName': participantsName,
-      'absenteesName': absenteesName,
+      'checkList': checkList,
     };
   }
 }
@@ -43,10 +44,16 @@ class DatabaseHelperAttendanceResult{
       join(await getDatabasesPath(), 'attendance_result_database.db'),
       onCreate: (db, version) {
         return db.execute(
-          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, conferenceName TEXT, participantsName TEXT, absenteesName TEXT)",
+          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, conferenceName TEXT, participantsName TEXT, checkList INTEGER)",
         );
       },
-      version: 1,
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+      if (oldVersion < 2) {
+        // checkList カラムを追加するSQL文を実行
+        await db.execute("ALTER TABLE $tableName ADD COLUMN checkList INTEGER");
+      }
+    },
+      version: 2,
     );
   }
   Future<void> insertAttendanceResult(AttendanceResult attendanceResult) async {
@@ -66,7 +73,7 @@ class DatabaseHelperAttendanceResult{
         id: maps[i]['id'],
         conferenceName: maps[i]['conferenceName'],
         participantsName: maps[i]['participantsName'],
-        absenteesName: maps[i]['absenteesName'],
+        checkList: maps[i]['checkList'],
       );
     });
   }
