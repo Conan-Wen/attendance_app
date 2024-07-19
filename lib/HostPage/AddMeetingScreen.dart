@@ -90,7 +90,7 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                     .toList();
                 if (name.isNotEmpty && participants.isNotEmpty) {
                   await DatabaseHelper().insertMeeting(Meeting(
-                      id: 0, meetingName: name, participants: participants));
+                      id: 0, meetingName: name, participants: participants, closed: 0));
                   Navigator.of(context).pop(true); // trueを渡して追加が成功したことを示す
                 }
               },
@@ -106,11 +106,12 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                     .toList();
                 if (name.isNotEmpty && participants.isNotEmpty) {
                   await DatabaseHelper().insertMeeting(Meeting(
-                      id: 0, meetingName: name, participants: participants));
+                      id: 0, meetingName: name, participants: participants, closed: 0));
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) => HostPage(
+                                id: 0,
                                 conferenceName: name,
                                 participants: participants,
                               )));
