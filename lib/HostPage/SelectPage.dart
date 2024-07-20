@@ -21,15 +21,6 @@ class _SelectPage extends State<SelectPage> {
     meetings = DatabaseHelper().getMeetings();
   }
 
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    setState(() {
-      meetings = DatabaseHelper().getMeetings();
-    });
-  }
-
   void _navigateToAddMeeting() async {
     final result = await Navigator.push(
       context,
@@ -44,7 +35,7 @@ class _SelectPage extends State<SelectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('開催者ページ'),
+        title: Text('登録会議一覧'),
       ),
       body: FutureBuilder<List<Meeting>>(
         future: meetings,
@@ -99,10 +90,11 @@ class _SelectPage extends State<SelectPage> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      bottomNavigationBar: BottomAppBar(
+          child: FloatingActionButton(
         onPressed: _navigateToAddMeeting,
-        child: Icon(Icons.add),
-      ),
+        child: Text("新しい会議"),
+      )),
     );
   }
 }

@@ -21,11 +21,7 @@ class HostPage extends StatefulWidget {
 }
 
 class _HostPageState extends State<HostPage> {
-  IconData statusIcon = Icons.check_circle;
-  Color iconColor = Colors.green;
   late List<bool> checkList;
-  List<Device> devices = [];
-  List<Device> connectedDevices = [];
   late NearbyService nearbyService;
   late StreamSubscription subscription;
   late StreamSubscription receivedDataSubscription;
@@ -41,18 +37,18 @@ class _HostPageState extends State<HostPage> {
   void _registerAttendance(name, deviceId) {
     // 出席登録の処理
     setState(() {
+      String response = "出席者リストに存在しません";
       for (int i = 0; i < widget.participants.length; i++) {
-        if (widget.participants[i] == name && !checkList[i]) {
-          checkList[i] = true;
-          nearbyService.sendMessage(deviceId, "出席登録完了");
-          break;
-        } else if (widget.participants[i] == name && checkList[i]) {
-          nearbyService.sendMessage(deviceId, "出席登録済み");
-          break;
-        } else if (i == widget.participants.length - 1) {
-          nearbyService.sendMessage(deviceId, "出席者リストに存在しません");
+        if (widget.participants[i] == name) {
+          response = checkList[i] ? "出席登録済み" : "出席登録完了";
+          //未出席だった人の処理
+          if (!checkList[i]) {
+            checkList[i] = true;
+            break;
+          }
         }
       }
+      nearbyService.sendMessage(deviceId, response);
       nearbyService.disconnectPeer(deviceID: deviceId);
     });
   }
@@ -64,14 +60,13 @@ class _HostPageState extends State<HostPage> {
       // bluetooth待ち解除
       nearbyService.stopAdvertisingPeer();
       nearbyService.startBrowsingForPeers();
-      connectedDevices.clear();
       //集計結果画面遷移？？
       DatabaseHelper().updateMeeting(Meeting(
           id: widget.id,
           meetingName: widget.conferenceName,
           participants: widget.participants,
           closed: 1));
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => AttendanceResultScreen(
@@ -160,23 +155,13 @@ class _HostPageState extends State<HostPage> {
         print(
             " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
       });
-
-      setState(() {
-        devices.clear();
-        devices.addAll(devicesList);
-        connectedDevices.clear();
-        connectedDevices.addAll(devicesList
-            .where((d) => d.state == SessionState.connected)
-            .toList());
-      });
     });
 
     // メッセージ（氏名）を受け取った場合の処理
     receivedDataSubscription =
         nearbyService.dataReceivedSubscription(callback: (data) {
       print("dataReceivedSubscription: ${jsonEncode(data)}");
-      String participantName = data["message"];
-      _registerAttendance(participantName, data["senderDeviceId"]);
+      _registerAttendance(data["message"], data["senderDeviceId"]);
     });
   }
 }
