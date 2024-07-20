@@ -14,6 +14,53 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
   final _nameController = TextEditingController();
   final List<TextEditingController> _participantControllers = [];
 
+  Future<bool> _showConfirmationDialog(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('登録確認'),
+          content: Text('この会議を登録しますか?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text('いいえ'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text('はい'),
+            ),
+          ],
+        );
+      },
+    ).then((value) => value ?? false);
+  }
+
+  void _showAlertDialog(BuildContext content) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('警告'),
+          content: Text('入力内容に不備があります'),
+          actions: <Widget>[
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"))
+          ],
+        );
+      },
+    );
+  }
+
   void _addParticipantField() {
     setState(() {
       _participantControllers.add(TextEditingController());
@@ -92,8 +139,10 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
                     .toList();
                 if (name.isNotEmpty && participants.isNotEmpty) {
                   await DatabaseHelper().insertMeeting(Meeting(
-                      id: 0, meetingName: name, participants: participants));
+                      id: 0, meetingName: name, participants: participants, closed: 0));
                   Navigator.of(context).pop(true); // trueを渡して追加が成功したことを示す
+                } else {
+                  _showAlertDialog(context);
                 }
               },
               child: const Text('会議の追加'),
@@ -107,15 +156,21 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
                     .where((text) => text.isNotEmpty)
                     .toList();
                 if (name.isNotEmpty && participants.isNotEmpty) {
-                  await DatabaseHelper().insertMeeting(Meeting(
-                      id: 0, meetingName: name, participants: participants));
+                  bool result = await _showConfirmationDialog(context);
+                  if (result) {
+                    await DatabaseHelper().insertMeeting(Meeting(
+                        id: 0, meetingName: name, participants: participants, closed: 0));
+                  }
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) => HostPage(
+                                id: 0,
                                 conferenceName: name,
                                 participants: participants,
                               )));
+                } else {
+                  _showAlertDialog(context);
                 }
               },
               child: const Text('会議の開始'),

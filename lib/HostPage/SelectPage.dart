@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import './main.dart';
 import 'Database.dart';
 import 'AddMeetingScreen.dart';
-import 'attendance_result_database.dart';
 import 'attendance_result.dart';
-import 'dart:convert';
-import 'dart:typed_data';
+import 'ClosedPage.dart';
+import 'attendance_result_database.dart';
 
 class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
@@ -24,15 +23,6 @@ class SelectPageState extends State<SelectPage> {
     super.initState();
     meetings = DatabaseHelper().getMeetings();
     attendanceResults = DatabaseHelperAttendanceResult().getAttendanceResults();
-  }
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    setState(() {
-      meetings = DatabaseHelper().getMeetings();
-    });
   }
 
   void _navigateToAddMeeting() async {
@@ -56,10 +46,10 @@ class SelectPageState extends State<SelectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('開催者ページ'),
+        title: const Text('登録会議一覧'),
       ),
       body: Column(
-        children: [
+        children:[
           Expanded(child:FutureBuilder<List<Meeting>>(
             future: meetings,
             builder: (context, snapshot) {
@@ -74,35 +64,47 @@ class SelectPageState extends State<SelectPage> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     final meeting = snapshot.data![index];
+                    String closing = meeting.closed == 0 ? '' : '(締切済み)';
                     return ListTile(
-                      title: Text(meeting.meetingName),
-                      subtitle: Text('参加者: ${meeting.participants.join(', ')}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () async {
-                          await DatabaseHelper().deleteMeeting(meeting.id);
-                          setState(() {
-                            meetings = DatabaseHelper().getMeetings();
-                          });
-                        },
-                      ),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HostPage(
-                            conferenceName: meeting.meetingName,
-                            participants: meeting.participants,
-                          )
-                        )
-                      )
+                        title: Text(meeting.meetingName + closing),
+                        subtitle: Text('参加者: ${meeting.participants.join(', ')}'),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () async {
+                            await DatabaseHelper().deleteMeeting(meeting.id);
+                            setState(() {
+                              meetings = DatabaseHelper().getMeetings();
+                            });
+                          },
+                        ),
+                        onTap: () {
+                          if (meeting.closed == 0) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HostPage(
+                                  id: meeting.id,
+                                  conferenceName: meeting.meetingName,
+                                  participants: meeting.participants,
+                                ),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MeetingClosedPage(),
+                              ),
+                            );
+                          }
+                        });
+                      },
                     );
-                  },
-                );
-              }
-            },
-          ),
-        ),
-        Expanded(
+                  }
+                },
+              ),
+            ),
+            Expanded(
             child: FutureBuilder<List<AttendanceResult>>(
             future: attendanceResults,
             builder: (context, snapshot) {
@@ -141,15 +143,16 @@ class SelectPageState extends State<SelectPage> {
                     },
                   );
                 }
-              },
+              }
             )
-          ),
+          )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      bottomNavigationBar: BottomAppBar(
+          child: FloatingActionButton(
         onPressed: _navigateToAddMeeting,
-        child: const Icon(Icons.add),
-      ),
+        child: const Text("新しい会議"),
+      )),
     );
   }
 }
