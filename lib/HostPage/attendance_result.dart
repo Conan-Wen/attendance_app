@@ -16,11 +16,19 @@ class AttendanceResultScreen extends StatefulWidget {
 
 class AttendanceResultScreenState extends State<AttendanceResultScreen> {
   Future<void> saveAttendanceResult() async {
+    List<int> checkListInt=[];
+    for (int i = 0; i < widget.participants.length; i++) {
+      if (widget.checkList[i]) {
+        checkListInt.add(1);
+      } else {
+        checkListInt.add(0);
+      }
+    }
     await DatabaseHelperAttendanceResult().insertAttendanceResult(AttendanceResult(
       id: 0,
       conferenceName: widget.conferenceName,
       participantsName: widget.participants,
-      checkList: widget.checkList,
+      checkList: checkListInt,
     ));
     if (mounted) {
       Navigator.popUntil(context, (route) => route.isFirst);
@@ -29,8 +37,6 @@ class AttendanceResultScreenState extends State<AttendanceResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> participantsName = [];
-    List<String> absenteesName = [];
     List<DropdownMenuItem<String>> presentItems = [];
     List<DropdownMenuItem<String>> absentItems = [];
 
@@ -42,10 +48,8 @@ class AttendanceResultScreenState extends State<AttendanceResultScreen> {
 
       if (widget.checkList[i]) {
         presentItems.add(item);
-        participantsName.add(widget.participants[i]);
       } else {
         absentItems.add(item);
-        absenteesName.add(widget.participants[i]);
       }
     }
 
@@ -90,7 +94,10 @@ class AttendanceResultScreenState extends State<AttendanceResultScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () async{
-          await saveAttendanceResult();
+          if (widget.conferenceName.isNotEmpty && widget.participants.isNotEmpty && widget.checkList.isNotEmpty) {
+            await saveAttendanceResult();
+            return;
+          }
         },
         child: const Icon(Icons.home),
       ),

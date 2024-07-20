@@ -5,7 +5,7 @@ class AttendanceResult{
   int id;
   String conferenceName;
   List<String> participantsName;
-  List<bool> checkList;
+  List<int> checkList;
 
 
   AttendanceResult({required this.id, required this.conferenceName,required this.participantsName,required this.checkList});
@@ -44,16 +44,16 @@ class DatabaseHelperAttendanceResult{
       join(await getDatabasesPath(), 'attendance_result_database.db'),
       onCreate: (db, version) {
         return db.execute(
-          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, conferenceName TEXT, participantsName TEXT, checkList INTEGER)",
+          '''CREATE TABLE $tableName(id INTEGER PRIMARY KEY AUTOINCREMENT, conferenceName TEXT, participantsName TEXT, checkList INTEGER)''',
         );
       },
-      onUpgrade: (Database db, int oldVersion, int newVersion) async {
-      if (oldVersion < 2) {
-        // checkList カラムを追加するSQL文を実行
-        await db.execute("ALTER TABLE $tableName ADD COLUMN checkList INTEGER");
-      }
-    },
-      version: 2,
+    //   onUpgrade: (Database db, int oldVersion, int newVersion) async {
+    //   if (oldVersion < 2) {
+    //     // checkList カラムを追加するSQL文を実行
+    //     await db.execute("ALTER TABLE $tableName ADD COLUMN checkList INTEGER");
+    //   }
+    // },
+      version: 1,
     );
   }
   Future<void> insertAttendanceResult(AttendanceResult attendanceResult) async {

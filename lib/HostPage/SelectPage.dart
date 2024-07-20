@@ -4,6 +4,8 @@ import 'Database.dart';
 import 'AddMeetingScreen.dart';
 import 'attendance_result_database.dart';
 import 'attendance_result.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
@@ -15,6 +17,7 @@ class SelectPage extends StatefulWidget {
 class SelectPageState extends State<SelectPage> {
   late Future<List<Meeting>> meetings;
   Future<List<AttendanceResult>>? attendanceResults;
+  List<bool> checkListBool=[];
 
   @override
   void initState() {
@@ -43,6 +46,7 @@ class SelectPageState extends State<SelectPage> {
   }
 
   void _loadAttendanceResults() {
+
     setState(() {
       attendanceResults = DatabaseHelperAttendanceResult().getAttendanceResults();
     });
@@ -120,7 +124,7 @@ class SelectPageState extends State<SelectPage> {
                           icon: const Icon(Icons.delete),
                           onPressed: () async {
                             await DatabaseHelperAttendanceResult().deleteAttendanceResult(attendanceResult.id);
-                            _loadAttendanceResults(); // ここでリロード
+                            _loadAttendanceResults();
                           },
                         ),
                         onTap: () => Navigator.push(
@@ -129,7 +133,7 @@ class SelectPageState extends State<SelectPage> {
                             builder: (context) => AttendanceResultScreen(
                               conferenceName: attendanceResult.conferenceName,
                               participants: attendanceResult.participantsName,
-                              checkList: attendanceResult.checkList,
+                              checkList: attendanceResult.checkList.map((i) => i != 0).toList(),
                             )
                           )
                         )
