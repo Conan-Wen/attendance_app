@@ -73,6 +73,13 @@ class DatabaseHelper {
     });
   }
 
+  Future<Meeting> getMeeting(int id) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps =
+        await db.query(tableName, where: 'id = ?', whereArgs: [id]);
+    return Meeting.fromMap(maps.first);
+  }
+
   Future<void> deleteMeeting(int id) async {
     final db = await database;
     await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
