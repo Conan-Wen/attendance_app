@@ -15,7 +15,7 @@ class SelectPage extends StatefulWidget {
 class SelectPageState extends State<SelectPage> {
   late Future<List<Meeting>> meetings;
   Future<List<AttendanceResult>>? attendanceResults;
-  List<bool> checkListBool=[];
+  List<bool> checkListBool = [];
 
   @override
   void initState() {
@@ -35,9 +35,9 @@ class SelectPageState extends State<SelectPage> {
   }
 
   void _loadAttendanceResults() {
-
     setState(() {
-      attendanceResults = DatabaseHelperAttendanceResult().getAttendanceResults();
+      attendanceResults =
+          DatabaseHelperAttendanceResult().getAttendanceResults();
     });
   }
 
@@ -48,25 +48,26 @@ class SelectPageState extends State<SelectPage> {
         title: const Text('登録会議一覧'),
       ),
       body: Column(
-        children:[
-          Expanded(child:FutureBuilder<List<Meeting>>(
-            future: meetings,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('登録した会議はありません'));
-              } else {
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    final meeting = snapshot.data![index];
-                    String closing = meeting.closed == 0 ? '' : '(締切済み)';
-                    return ListTile(
-                        title: Text(meeting.meetingName + closing),
-                        subtitle: Text('参加者: ${meeting.participants.join(', ')}'),
+        children: [
+          Expanded(
+            child: FutureBuilder<List<Meeting>>(
+              future: meetings,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('登録した会議はありません'));
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final meeting = snapshot.data![index];
+                      return ListTile(
+                        title: Text(meeting.meetingName),
+                        subtitle:
+                            Text('参加者: ${meeting.participants.join(', ')}'),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () async {
@@ -77,74 +78,66 @@ class SelectPageState extends State<SelectPage> {
                           },
                         ),
                         onTap: () {
-                          if (meeting.closed == 0) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HostPage(
-                                  id: meeting.id,
-                                  conferenceName: meeting.meetingName,
-                                  participants: meeting.participants,
-                                ),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HostPage(
+                                id: meeting.id,
+                                conferenceName: meeting.meetingName,
+                                participants: meeting.participants,
                               ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MeetingClosedPage(),
-                              ),
-                            );
-                          }
-                        });
-                      },
-                    );
-                  }
-                },
-              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
+              },
             ),
-        //     Expanded(
-        //     child: FutureBuilder<List<AttendanceResult>>(
-        //     future: attendanceResults,
-        //     builder: (context, snapshot) {
-        //       if (snapshot.connectionState == ConnectionState.waiting) {
-        //         return const Center(child: CircularProgressIndicator());
-        //       } else if (snapshot.hasError) {
-        //           return Center(child: Text('Error: ${snapshot.error}'));
-        //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        //           return const Center(child: Text('出席記録はありません'));
-        //       } else {
-        //           return ListView.builder(
-        //             itemCount: snapshot.data!.length,
-        //             itemBuilder: (context, index) {
-        //               final attendanceResult = snapshot.data![index];
-        //               return ListTile(
-        //                 title: Text(attendanceResult.conferenceName),
-        //                 subtitle: Text('参加者: ${attendanceResult.participantsName.join(', ')}'),
-        //                 trailing: IconButton(
-        //                   icon: const Icon(Icons.delete),
-        //                   onPressed: () async {
-        //                     await DatabaseHelperAttendanceResult().deleteAttendanceResult(attendanceResult.id);
-        //                     _loadAttendanceResults();
-        //                   },
-        //                 ),
-        //                 onTap: () => Navigator.push(
-        //                   context,
-        //                   MaterialPageRoute(
-        //                     builder: (context) => AttendanceResultScreen(
-        //                       conferenceName: attendanceResult.conferenceName,
-        //                       participants: attendanceResult.participantsName,
-        //                       checkList: attendanceResult.checkList.map((i) => i != 0).toList(),
-        //                     )
-        //                   )
-        //                 )
-        //               );
-        //             },
-        //           );
-        //         }
-        //       }
-        //     )
-        //   )
+          ),
+          //     Expanded(
+          //     child: FutureBuilder<List<AttendanceResult>>(
+          //     future: attendanceResults,
+          //     builder: (context, snapshot) {
+          //       if (snapshot.connectionState == ConnectionState.waiting) {
+          //         return const Center(child: CircularProgressIndicator());
+          //       } else if (snapshot.hasError) {
+          //           return Center(child: Text('Error: ${snapshot.error}'));
+          //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          //           return const Center(child: Text('出席記録はありません'));
+          //       } else {
+          //           return ListView.builder(
+          //             itemCount: snapshot.data!.length,
+          //             itemBuilder: (context, index) {
+          //               final attendanceResult = snapshot.data![index];
+          //               return ListTile(
+          //                 title: Text(attendanceResult.conferenceName),
+          //                 subtitle: Text('参加者: ${attendanceResult.participantsName.join(', ')}'),
+          //                 trailing: IconButton(
+          //                   icon: const Icon(Icons.delete),
+          //                   onPressed: () async {
+          //                     await DatabaseHelperAttendanceResult().deleteAttendanceResult(attendanceResult.id);
+          //                     _loadAttendanceResults();
+          //                   },
+          //                 ),
+          //                 onTap: () => Navigator.push(
+          //                   context,
+          //                   MaterialPageRoute(
+          //                     builder: (context) => AttendanceResultScreen(
+          //                       conferenceName: attendanceResult.conferenceName,
+          //                       participants: attendanceResult.participantsName,
+          //                       checkList: attendanceResult.checkList.map((i) => i != 0).toList(),
+          //                     )
+          //                   )
+          //                 )
+          //               );
+          //             },
+          //           );
+          //         }
+          //       }
+          //     )
+          //   )
         ],
       ),
       bottomNavigationBar: BottomAppBar(
