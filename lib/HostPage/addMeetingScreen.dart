@@ -4,7 +4,8 @@ import './main.dart';
 // import './SelectPage.dart';
 
 class AddMeetingScreen extends StatefulWidget {
-  const AddMeetingScreen({super.key});
+  final int? id;
+  const AddMeetingScreen({super.key, this.id});
 
   @override
   AddMeetingScreenState createState() => AddMeetingScreenState();
@@ -12,28 +13,47 @@ class AddMeetingScreen extends StatefulWidget {
 
 class AddMeetingScreenState extends State<AddMeetingScreen> {
   final _nameController = TextEditingController();
-  final List<TextEditingController> _participantControllers = [];
-
+  late List<TextEditingController> _participantControllers = [];
+  String title = '会議追加ページ';
+  String completeButtonName = '会議の追加';
+  
+  @override
+  void initState() {
+    super.initState();
+    Meeting meeting = Meeting(id: 0, meetingName: '', participants: []);
+    if (widget.id != null) {
+      title = '会議編集ページ';
+      completeButtonName = '編集完了';
+      DatabaseHelper().getMeeting(widget.id!).then((value) {
+        meeting = value;
+        _nameController.text = meeting.meetingName;
+        _participantControllers = meeting.participants
+            .map((participant) => TextEditingController(text: participant))
+            .toList();
+        _addParticipantField();
+      });
+    }
+  }
   Future<bool> _showConfirmationDialog(BuildContext context) async {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('登録確認'),
-          content: Text('この会議を登録しますか?'),
+          title: const Text('登録確認'),
+          content: const Text('この会議を登録しますか?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text('いいえ'),
+              child: const Text('いいえ'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text('はい'),
+              child: const Text('はい'),
             ),
           ],
         );
@@ -47,14 +67,14 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('警告'),
-          content: Text('入力内容に不備があります'),
+          title: const Text('警告'),
+          content: const Text('入力内容に不備があります'),
           actions: <Widget>[
             TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"))
+                child: const Text("OK"))
           ],
         );
       },
@@ -77,7 +97,7 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('会議追加ページ'),
+        title: Text(title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -145,7 +165,7 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
                   _showAlertDialog(context);
                 }
               },
-              child: const Text('会議の追加'),
+              child: Text(completeButtonName),
             ),
             const SizedBox(width: 20),
             ElevatedButton(
