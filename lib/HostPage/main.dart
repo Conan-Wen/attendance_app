@@ -12,7 +12,10 @@ class HostPage extends StatefulWidget {
   final int closed = 0;
 
   const HostPage(
-      {super.key, required this.id, required this.conferenceName, required this.participants});
+      {super.key,
+      required this.id,
+      required this.conferenceName,
+      required this.participants});
 
   @override
   HostPageState createState() => HostPageState();
@@ -64,13 +67,14 @@ class HostPageState extends State<HostPage> {
       DatabaseHelper().updateMeeting(Meeting(
           id: widget.id,
           meetingName: widget.conferenceName,
-          participants: widget.participants,
-          closed: 1));
+          participants: widget.participants));
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => AttendanceResultScreen(
-                  participants: widget.participants, checkList: checkList, conferenceName: widget.conferenceName)));
+                  participants: widget.participants,
+                  checkList: checkList,
+                  conferenceName: widget.conferenceName)));
     });
   }
 
@@ -95,7 +99,11 @@ class HostPageState extends State<HostPage> {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.conferenceName),
+        title: Text(
+          widget.conferenceName,
+          style: const TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
       ),
       body: Column(
         children: [
@@ -141,10 +149,10 @@ class HostPageState extends State<HostPage> {
         });
     subscription =
         nearbyService.stateChangedSubscription(callback: (devicesList) {
-      devicesList.forEach((element) {
+      for (var element in devicesList) {
         print(
             " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
-      });
+      }
     });
 
     // メッセージ（氏名）を受け取った場合の処理
