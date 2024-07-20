@@ -6,9 +6,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 
-
 class GuestPage extends StatefulWidget {
-
   const GuestPage({super.key});
 
   @override
@@ -27,6 +25,7 @@ class _GuestPageState extends State<GuestPage> {
     super.initState();
     init();
   }
+
   @override
   void dispose() {
     subscription.cancel();
@@ -36,14 +35,20 @@ class _GuestPageState extends State<GuestPage> {
     super.dispose();
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         // appBar: AppBar(
         //   title: Text(widget.deviceType.toString().substring(11).toUpperCase()),
         // ),
         appBar: AppBar(
-          title: Text("参加者ページ"),
+          title: const Text(
+            "ミーティングに参加",
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87),
+          ),
         ),
         backgroundColor: Colors.white,
         body: ListView.builder(
@@ -51,7 +56,7 @@ class _GuestPageState extends State<GuestPage> {
             itemBuilder: (context, index) {
               final device = devices[index];
               return Container(
-                margin: EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
                     Row(
@@ -60,6 +65,7 @@ class _GuestPageState extends State<GuestPage> {
                             child: GestureDetector(
                           onTap: () => _onTabItemListener(device),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(device.deviceName),
                               Text(
@@ -68,22 +74,21 @@ class _GuestPageState extends State<GuestPage> {
                                     color: getStateColor(device.state)),
                               ),
                             ],
-                            crossAxisAlignment: CrossAxisAlignment.start,
                           ),
                         )),
                         // Request connect
                         GestureDetector(
                           onTap: () => _onButtonClicked(device),
                           child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            padding: EdgeInsets.all(8.0),
+                            margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.all(8.0),
                             height: 35,
                             width: 100,
                             color: getButtonColor(device.state),
                             child: Center(
                               child: Text(
                                 getButtonStateName(device.state),
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -92,10 +97,10 @@ class _GuestPageState extends State<GuestPage> {
                         )
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8.0,
                     ),
-                    Divider(
+                    const Divider(
                       height: 1,
                       color: Colors.grey,
                     )
@@ -104,6 +109,7 @@ class _GuestPageState extends State<GuestPage> {
               );
             }));
   }
+
   String getStateName(SessionState state) {
     switch (state) {
       case SessionState.notConnected:
@@ -153,17 +159,17 @@ class _GuestPageState extends State<GuestPage> {
           builder: (BuildContext context) {
             final myController = TextEditingController();
             return AlertDialog(
-              title: Text("Send message"),
+              title: const Text("Send message"),
               content: TextField(controller: myController),
               actions: [
                 TextButton(
-                  child: Text("Cancel"),
+                  child: const Text("Cancel"),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: Text("Send"),
+                  child: const Text("Send"),
                   onPressed: () {
                     nearbyService.sendMessage(
                         device.deviceId, myController.text);
@@ -177,8 +183,8 @@ class _GuestPageState extends State<GuestPage> {
   }
 
   int getItemCount() {
-      return devices.length;
-    }
+    return devices.length;
+  }
 
   _onButtonClicked(Device device) {
     switch (device.state) {
@@ -215,14 +221,14 @@ class _GuestPageState extends State<GuestPage> {
         callback: (isRunning) async {
           if (isRunning) {
             await nearbyService.stopBrowsingForPeers();
-            await Future.delayed(Duration(microseconds: 200));
+            await Future.delayed(const Duration(microseconds: 200));
             await nearbyService.startBrowsingForPeers();
           }
         });
 
     subscription =
         nearbyService.stateChangedSubscription(callback: (devicesList) {
-      devicesList.forEach((element) {
+      for (var element in devicesList) {
         print(
             " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
 
@@ -233,7 +239,7 @@ class _GuestPageState extends State<GuestPage> {
             nearbyService.startBrowsingForPeers();
           }
         }
-      });
+      }
 
       setState(() {
         devices.clear();
