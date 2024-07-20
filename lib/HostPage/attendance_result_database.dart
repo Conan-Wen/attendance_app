@@ -54,7 +54,7 @@ class DatabaseHelperAttendanceResult{
     final Database db = await database;
     await db.insert(
       tableName,
-      attendanceResult.toMap(),
+      attendanceResult.toMapExceptId(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
