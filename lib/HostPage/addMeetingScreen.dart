@@ -139,7 +139,7 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
                     .toList();
                 if (name.isNotEmpty && participants.isNotEmpty) {
                   await DatabaseHelper().insertMeeting(Meeting(
-                      id: 0, meetingName: name, participants: participants, closed: 0));
+                      id: 0, meetingName: name, participants: participants));
                   Navigator.of(context).pop(true); // trueを渡して追加が成功したことを示す
                 } else {
                   _showAlertDialog(context);
@@ -159,7 +159,7 @@ class AddMeetingScreenState extends State<AddMeetingScreen> {
                   bool result = await _showConfirmationDialog(context);
                   if (result) {
                     await DatabaseHelper().insertMeeting(Meeting(
-                        id: 0, meetingName: name, participants: participants, closed: 0));
+                        id: 0, meetingName: name, participants: participants));
                   }
                   Navigator.pushReplacement(
                       context,

@@ -5,25 +5,22 @@ class Meeting {
   int id;
   String meetingName;
   List<String> participants;
-  int closed;
 
   Meeting(
       {required this.id,
       required this.meetingName,
-      required this.participants,
-      required this.closed});
+      required this.participants});
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'meetingName': meetingName,
       'participants': participants.join(','), // 参加者を文字列に変換
-      'closed': closed,
     };
   }
 
   Map<String, dynamic> toMapExceptId() {
-    return {'meetingName': meetingName, 'participants': participants.join(','), 'closed': closed};
+    return {'meetingName': meetingName, 'participants': participants.join(',')};
   }
 
   factory Meeting.fromMap(Map<String, dynamic> map) {
@@ -31,7 +28,6 @@ class Meeting {
       id: map['id'],
       meetingName: map['meetingName'],
       participants: map['participants'].split(','), // 文字列をリストに変換
-      closed: map['closed'],
     );
   }
 }
@@ -58,8 +54,7 @@ class DatabaseHelper {
       CREATE TABLE $tableName(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         meetingName TEXT,
-        participants TEXT,
-        closed INTEGER DEFAULT 0
+        participants TEXT
       )
     ''');
   }
