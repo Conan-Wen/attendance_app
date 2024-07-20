@@ -56,7 +56,8 @@ class _GuestPageState extends State<GuestPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(device.deviceName, style: const TextStyle(fontSize: 24)),
+                              Text(device.deviceName,
+                                  style: const TextStyle(fontSize: 24)),
                             ],
                           ),
                         )),
@@ -72,10 +73,9 @@ class _GuestPageState extends State<GuestPage> {
                               child: Text(
                                 getButtonStateName(device.state),
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24
-                                ),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24),
                               ),
                             ),
                           ),
