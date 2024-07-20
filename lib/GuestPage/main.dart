@@ -95,17 +95,6 @@ class _GuestPageState extends State<GuestPage> {
             }));
   }
 
-  String getStateName(SessionState state) {
-    switch (state) {
-      case SessionState.notConnected:
-        return "disconnected";
-      case SessionState.connecting:
-        return "waiting";
-      default:
-        return "connected";
-    }
-  }
-
   String getButtonStateName(SessionState state) {
     switch (state) {
       case SessionState.notConnected:
@@ -148,6 +137,11 @@ class _GuestPageState extends State<GuestPage> {
       deviceName: device.deviceName,
     );
 
+    onCancelClicked(Device device) {
+      nearbyService.disconnectPeer(deviceID: device.deviceId);
+      setState(() {});
+    }
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -160,6 +154,7 @@ class _GuestPageState extends State<GuestPage> {
                 child: const Text("キャンセル"),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  onCancelClicked(device);
                 },
               ),
               TextButton(

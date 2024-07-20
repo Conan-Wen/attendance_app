@@ -4,26 +4,26 @@ import 'package:path/path.dart';
 class AttendanceResult{
   int id;
   String conferenceName;
-  List<String> participantsName;
-  List<int> checkList;
+  List<String> attendeesName;
+  List<String> absenteesName;
 
 
-  AttendanceResult({required this.id, required this.conferenceName,required this.participantsName,required this.checkList});
+  AttendanceResult({required this.id, required this.conferenceName, required this.attendeesName, required this.absenteesName});
 
   Map<String, dynamic> toMap(){
     return {
       'id': id,
       'conferenceName': conferenceName,
-      'participantsName': participantsName,
-      'checkList': checkList,
+      'attendeesName': attendeesName.join(','),
+      'absenteesName': absenteesName.join(','),
     };
   }
 
   Map<String, dynamic> toMapExceptId(){
     return {
       'conferenceName': conferenceName,
-      'participantsName': participantsName,
-      'checkList': checkList,
+      'attendeesName': attendeesName.join(','),
+      'absenteesName': absenteesName.join(','),
     };
   }
 }
@@ -44,15 +44,9 @@ class DatabaseHelperAttendanceResult{
       join(await getDatabasesPath(), 'attendance_result_database.db'),
       onCreate: (db, version) {
         return db.execute(
-          '''CREATE TABLE $tableName(id INTEGER PRIMARY KEY AUTOINCREMENT, conferenceName TEXT, participantsName TEXT, checkList INTEGER)''',
+          '''CREATE TABLE $tableName(id INTEGER PRIMARY KEY AUTOINCREMENT, conferenceName TEXT, attendeesName TEXT, absenteesName TEXT)''',
         );
       },
-    //   onUpgrade: (Database db, int oldVersion, int newVersion) async {
-    //   if (oldVersion < 2) {
-    //     // checkList カラムを追加するSQL文を実行
-    //     await db.execute("ALTER TABLE $tableName ADD COLUMN checkList INTEGER");
-    //   }
-    // },
       version: 1,
     );
   }
@@ -60,7 +54,7 @@ class DatabaseHelperAttendanceResult{
     final Database db = await database;
     await db.insert(
       tableName,
-      attendanceResult.toMap(),
+      attendanceResult.toMapExceptId(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -72,8 +66,8 @@ class DatabaseHelperAttendanceResult{
       return AttendanceResult(
         id: maps[i]['id'],
         conferenceName: maps[i]['conferenceName'],
-        participantsName: maps[i]['participantsName'],
-        checkList: maps[i]['checkList'],
+        attendeesName: maps[i]['attendeesName'].split(','),
+        absenteesName: maps[i]['absenteesName'].split(','),
       );
     });
   }

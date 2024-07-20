@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import './main.dart';
 import 'Database.dart';
 import 'AddMeetingScreen.dart';
-import 'ClosedPage.dart';
 import 'attendance_result_database.dart';
+import 'result_log_list_screen.dart';
 
 class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
@@ -34,12 +34,6 @@ class SelectPageState extends State<SelectPage> {
     });
   }
 
-  void _loadAttendanceResults() {
-    setState(() {
-      attendanceResults =
-          DatabaseHelperAttendanceResult().getAttendanceResults();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +62,30 @@ class SelectPageState extends State<SelectPage> {
                         title: Text(meeting.meetingName),
                         subtitle:
                             Text('参加者: ${meeting.participants.join(', ')}'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () async {
-                            await DatabaseHelper().deleteMeeting(meeting.id);
-                            setState(() {
-                              meetings = DatabaseHelper().getMeetings();
-                            });
-                          },
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit_rounded),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddMeetingScreen(id: meeting.id),
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () async {
+                                await DatabaseHelper().deleteMeeting(meeting.id);
+                                setState(() {
+                                  meetings = DatabaseHelper().getMeetings();
+                                });
+                              },
+                            ),
+                          ],
                         ),
                         onTap: () {
                           Navigator.push(
@@ -141,10 +151,29 @@ class SelectPageState extends State<SelectPage> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          child: FloatingActionButton(
-        onPressed: _navigateToAddMeeting,
-        child: const Text("新しい会議"),
-      )),
+        child:Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed:_navigateToAddMeeting,
+              child: const Text('新しい会議'),
+            ),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              onPressed:
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ResultLogListPage(),
+                  ),
+                );
+              },
+              child: const Text('会議の履歴'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
