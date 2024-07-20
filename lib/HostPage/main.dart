@@ -67,8 +67,7 @@ class HostPageState extends State<HostPage> {
       DatabaseHelper().updateMeeting(Meeting(
           id: widget.id,
           meetingName: widget.conferenceName,
-          participants: widget.participants,
-          closed: 1));
+          participants: widget.participants));
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
