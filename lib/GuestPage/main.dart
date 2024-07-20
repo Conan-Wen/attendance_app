@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 
 class GuestPage extends StatefulWidget {
   const GuestPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _GuestPageState createState() => _GuestPageState();
 }
 
@@ -38,17 +37,8 @@ class _GuestPageState extends State<GuestPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   title: Text(widget.deviceType.toString().substring(11).toUpperCase()),
-        // ),
         appBar: AppBar(
-          title: const Text(
-            "ミーティングに参加",
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87),
-          ),
+          title: const Text("参加者ページ"),
         ),
         backgroundColor: Colors.white,
         body: ListView.builder(
@@ -63,16 +53,11 @@ class _GuestPageState extends State<GuestPage> {
                       children: [
                         Expanded(
                             child: GestureDetector(
-                          onTap: () => _onTabItemListener(device),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(device.deviceName),
-                              Text(
-                                getStateName(device.state),
-                                style: TextStyle(
-                                    color: getStateColor(device.state)),
-                              ),
+                              Text(device.deviceName,
+                                  style: const TextStyle(fontSize: 24)),
                             ],
                           ),
                         )),
@@ -82,15 +67,15 @@ class _GuestPageState extends State<GuestPage> {
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 8.0),
                             padding: const EdgeInsets.all(8.0),
-                            height: 35,
-                            width: 100,
+                            width: 120,
                             color: getButtonColor(device.state),
                             child: Center(
                               child: Text(
                                 getButtonStateName(device.state),
                                 style: const TextStyle(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24),
                               ),
                             ),
                           ),
@@ -125,9 +110,9 @@ class _GuestPageState extends State<GuestPage> {
     switch (state) {
       case SessionState.notConnected:
       case SessionState.connecting:
-        return "Connect";
+        return "参加";
       default:
-        return "Disconnect";
+        return "処理中...";
     }
   }
 
@@ -152,54 +137,42 @@ class _GuestPageState extends State<GuestPage> {
     }
   }
 
-  _onTabItemListener(Device device) {
-    if (device.state == SessionState.connected) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            final myController = TextEditingController();
-            return AlertDialog(
-              title: const Text("Send message"),
-              content: TextField(controller: myController),
-              actions: [
-                TextButton(
-                  child: const Text("Cancel"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: const Text("Send"),
-                  onPressed: () {
-                    nearbyService.sendMessage(
-                        device.deviceId, myController.text);
-                    myController.text = '';
-                  },
-                )
-              ],
-            );
-          });
-    }
-  }
-
   int getItemCount() {
     return devices.length;
   }
 
   _onButtonClicked(Device device) {
-    switch (device.state) {
-      case SessionState.notConnected:
-        nearbyService.invitePeer(
-          deviceID: device.deviceId,
-          deviceName: device.deviceName,
-        );
-        break;
-      case SessionState.connected:
-        nearbyService.disconnectPeer(deviceID: device.deviceId);
-        break;
-      case SessionState.connecting:
-        break;
-    }
+    SessionState.notConnected;
+    nearbyService.invitePeer(
+      deviceID: device.deviceId,
+      deviceName: device.deviceName,
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          final myController = TextEditingController();
+          return AlertDialog(
+            title: const Text("名前を入力"),
+            content: TextField(controller: myController),
+            actions: [
+              TextButton(
+                child: const Text("キャンセル"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text("送信"),
+                onPressed: () {
+                  nearbyService.sendMessage(device.deviceId, myController.text);
+                  myController.text = '';
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 
   void init() async {
@@ -229,9 +202,6 @@ class _GuestPageState extends State<GuestPage> {
     subscription =
         nearbyService.stateChangedSubscription(callback: (devicesList) {
       for (var element in devicesList) {
-        print(
-            " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
-
         if (Platform.isAndroid) {
           if (element.state == SessionState.connected) {
             nearbyService.stopBrowsingForPeers();
@@ -252,13 +222,6 @@ class _GuestPageState extends State<GuestPage> {
     });
 
     receivedDataSubscription =
-        nearbyService.dataReceivedSubscription(callback: (data) {
-      print("dataReceivedSubscription: ${jsonEncode(data)}");
-      showToast(jsonEncode(data),
-          context: context,
-          axis: Axis.horizontal,
-          alignment: Alignment.center,
-          position: StyledToastPosition.bottom);
-    });
+        nearbyService.dataReceivedSubscription(callback: (data) {});
   }
 }
