@@ -1,5 +1,6 @@
 import 'package:attendance_app/HostPage/attendance_result.dart';
 import 'package:flutter/material.dart';
+import 'package:attendance_app/HostPage/Database.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -7,11 +8,13 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 
 class HostPage extends StatefulWidget {
+  final int id;
   final String conferenceName;
   final List<String> participants;
+  final int closed = 0;
 
   const HostPage(
-      {super.key, required this.conferenceName, required this.participants});
+      {super.key, required this.id, required this.conferenceName, required this.participants});
 
   @override
   _HostPageState createState() => _HostPageState();
@@ -58,6 +61,11 @@ class _HostPageState extends State<HostPage> {
       nearbyService.stopAdvertisingPeer();
       nearbyService.startBrowsingForPeers();
       //集計結果画面遷移？？
+      DatabaseHelper().updateMeeting(Meeting(
+          id: widget.id,
+          meetingName: widget.conferenceName,
+          participants: widget.participants,
+          closed: 1));
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(

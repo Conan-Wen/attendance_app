@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import './main.dart';
 import 'Database.dart';
 import 'AddMeetingScreen.dart';
+import 'attendance_result.dart';
+import 'ClosedPage.dart';
 
 class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
@@ -49,8 +51,9 @@ class _SelectPage extends State<SelectPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final meeting = snapshot.data![index];
+                String closing = meeting.closed == 0 ? '' : '(締切済み)';
                 return ListTile(
-                    title: Text(meeting.meetingName),
+                    title: Text(meeting.meetingName + closing),
                     subtitle: Text('参加者: ${meeting.participants.join(', ')}'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
@@ -61,13 +64,27 @@ class _SelectPage extends State<SelectPage> {
                         });
                       },
                     ),
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
+                    onTap: () {
+                      if (meeting.closed == 0) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
                             builder: (context) => HostPage(
-                                  conferenceName: meeting.meetingName,
-                                  participants: meeting.participants,
-                                ))));
+                              id: meeting.id,
+                              conferenceName: meeting.meetingName,
+                              participants: meeting.participants,
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MeetingClosedPage(),
+                          ),
+                        );
+                      }
+                    });
               },
             );
           }
