@@ -1,7 +1,7 @@
 import 'package:attendance_app/HostPage/SelectPage.dart';
 import 'package:flutter/material.dart';
 import 'GuestPage/main.dart';
-import 'HostPage/main.dart';
+// import 'HostPage/main.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,9 +47,10 @@ class MyHomePage extends StatelessWidget {
               child: const Text('開催者ページ'),
             ),
             ElevatedButton(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const GuestPage())),
-                child: const Text('参加者ページ'))
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const GuestPage())),
+              child: const Text('参加者ページ')
+            )
           ],
         ),
       ),

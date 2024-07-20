@@ -17,10 +17,12 @@ class HostPage extends StatefulWidget {
       {super.key, required this.id, required this.conferenceName, required this.participants});
 
   @override
-  _HostPageState createState() => _HostPageState();
+  HostPageState createState() => HostPageState();
 }
 
-class _HostPageState extends State<HostPage> {
+class HostPageState extends State<HostPage> {
+  IconData statusIcon = Icons.check_circle;
+  Color iconColor = Colors.green;
   late List<bool> checkList;
   late NearbyService nearbyService;
   late StreamSubscription subscription;
@@ -70,7 +72,7 @@ class _HostPageState extends State<HostPage> {
           context,
           MaterialPageRoute(
               builder: (context) => AttendanceResultScreen(
-                  participants: widget.participants, checkList: checkList)));
+                  participants: widget.participants, checkList: checkList, conferenceName: widget.conferenceName)));
     });
   }
 
@@ -143,7 +145,7 @@ class _HostPageState extends State<HostPage> {
           if (isRunning) {
             await nearbyService.stopAdvertisingPeer();
             await nearbyService.stopBrowsingForPeers();
-            await Future.delayed(Duration(microseconds: 200));
+            await Future.delayed(const Duration(microseconds: 200));
             await nearbyService.startAdvertisingPeer();
             await nearbyService.startBrowsingForPeers();
             // }

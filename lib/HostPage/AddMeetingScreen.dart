@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import './Database.dart';
 import './main.dart';
-import './SelectPage.dart';
+// import './SelectPage.dart';
 
 class AddMeetingScreen extends StatefulWidget {
+  const AddMeetingScreen({super.key});
+
   @override
-  _AddMeetingScreenState createState() => _AddMeetingScreenState();
+  AddMeetingScreenState createState() => AddMeetingScreenState();
 }
 
-class _AddMeetingScreenState extends State<AddMeetingScreen> {
+class AddMeetingScreenState extends State<AddMeetingScreen> {
   final _nameController = TextEditingController();
   final List<TextEditingController> _participantControllers = [];
 
@@ -75,7 +77,7 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('新しい会議'),
+        title: const Text('会議追加ページ'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,18 +85,18 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: '会議名'),
+              decoration: const InputDecoration(labelText: '会議名'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
-                Text(
+                const Text(
                   '参加者の名前',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                Spacer(),
+                const Spacer(),
                 IconButton(
-                  icon: Icon(Icons.add),
+                  icon: const Icon(Icons.add),
                   onPressed: _addParticipantField,
                 ),
               ],
@@ -113,7 +115,7 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                         onPressed: () => _removeParticipantField(index),
                       ),
                     ],
@@ -143,9 +145,9 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                   _showAlertDialog(context);
                 }
               },
-              child: Text('会議を登録'),
+              child: const Text('会議の追加'),
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             ElevatedButton(
               onPressed: () async {
                 final name = _nameController.text;
@@ -171,7 +173,7 @@ class _AddMeetingScreenState extends State<AddMeetingScreen> {
                   _showAlertDialog(context);
                 }
               },
-              child: Text('会議の開始'),
+              child: const Text('会議の開始'),
             ),
           ],
         ),
