@@ -15,24 +15,16 @@ class AttendanceResultScreen extends StatefulWidget {
 }
 
 class AttendanceResultScreenState extends State<AttendanceResultScreen> {
+  List<String> attendeesName = [];
+  List<String> absenteesName = [];
+
   Future<void> saveAttendanceResult() async {
-    List<int> checkListInt=[];
-    for (int i = 0; i < widget.participants.length; i++) {
-      if (widget.checkList[i]) {
-        checkListInt.add(1);
-      } else {
-        checkListInt.add(0);
-      }
-    }
     await DatabaseHelperAttendanceResult().insertAttendanceResult(AttendanceResult(
       id: 0,
       conferenceName: widget.conferenceName,
-      participantsName: widget.participants,
-      checkList: checkListInt,
+      attendeesName: attendeesName,
+      absenteesName: absenteesName,
     ));
-    if (mounted) {
-      Navigator.popUntil(context, (route) => route.isFirst);
-    }
   }
 
   @override
@@ -48,8 +40,10 @@ class AttendanceResultScreenState extends State<AttendanceResultScreen> {
 
       if (widget.checkList[i]) {
         presentItems.add(item);
+        attendeesName.add(widget.participants[i]);
       } else {
         absentItems.add(item);
+        absenteesName.add(widget.participants[i]);
       }
     }
 
@@ -94,8 +88,9 @@ class AttendanceResultScreenState extends State<AttendanceResultScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () async{
-          if (widget.conferenceName.isNotEmpty && widget.participants.isNotEmpty && widget.checkList.isNotEmpty) {
+          if (widget.conferenceName.isNotEmpty || attendeesName.isNotEmpty || absenteesName.isNotEmpty) {
             await saveAttendanceResult();
+            Navigator.popUntil(context, (route) => route.isFirst);
             return;
           }
         },

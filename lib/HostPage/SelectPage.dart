@@ -4,6 +4,7 @@ import 'Database.dart';
 import 'AddMeetingScreen.dart';
 import 'ClosedPage.dart';
 import 'attendance_result_database.dart';
+import 'result_log_list_screen.dart';
 
 class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
@@ -141,10 +142,29 @@ class SelectPageState extends State<SelectPage> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          child: FloatingActionButton(
-        onPressed: _navigateToAddMeeting,
-        child: const Text("新しい会議"),
-      )),
+        child:Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed:_navigateToAddMeeting,
+              child: const Text('新しい会議'),
+            ),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              onPressed:
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ResultLogListPage(),
+                  ),
+                );
+              },
+              child: const Text('会議の履歴'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
